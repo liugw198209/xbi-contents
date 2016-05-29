@@ -1,4 +1,4 @@
-package com.xbi.contents.mining.com.xbi.contents.mining.examples;
+package com.xbi.contents.mining.examples;
 
 import org.canova.api.util.ClassPathResource;
 import org.deeplearning4j.berkeley.Pair;

@@ -1,4 +1,4 @@
-package com.xbi.contents.mining.com.xbi.contents.mining.examples;
+package com.xbi.contents.mining.examples;
 
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache;

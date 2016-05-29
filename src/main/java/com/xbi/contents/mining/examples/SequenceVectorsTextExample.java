@@ -1,4 +1,4 @@
-package com.xbi.contents.mining.com.xbi.contents.mining.examples;
+package com.xbi.contents.mining.examples;
 
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.inmemory.InMemoryLookupTable;
