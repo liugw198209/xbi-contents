@@ -5,8 +5,6 @@ import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.documentiterator.LabelledDocument;
 import org.deeplearning4j.text.documentiterator.LabelsSource;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,11 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * Please note: as of DL4j 3.9 this iterator is available as part of DL4j codebase, so there's no need to use this implementation.
  *
- * @author raver119@gmail.com
+ * @author Guangwen Liu
  */
 public class RowLabelAwareIterator implements LabelAwareIterator {
-    protected ResultSet rowSet;
-    protected AtomicInteger position = new AtomicInteger(1);
+    protected List<DocItem> rowSet;
+    protected AtomicInteger position = new AtomicInteger(0);
     protected LabelsSource labelsSource;
 
     /*
@@ -35,21 +33,14 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
 
     }
 
-    protected RowLabelAwareIterator(@NonNull ResultSet rs, @NonNull LabelsSource source) {
+    protected RowLabelAwareIterator(@NonNull List rs, @NonNull LabelsSource source) {
         this.rowSet = rs;
         this.labelsSource = source;
     }
 
     @Override
     public boolean hasNextDocument() {
-        try {
-            return rowSet.absolute(position.get());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            return false;
-        }
+        return(this.position.get() < this.rowSet.size());
     }
 
 
@@ -57,9 +48,9 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
     public LabelledDocument nextDocument() {
 
         try {
-            rowSet.absolute(position.getAndIncrement());
-            String label = rowSet.getString(1);
-            String content = rowSet.getString(2);
+            DocItem item = rowSet.get(position.getAndIncrement());
+            String label = item.getDocId();
+            String content = item.getDocContent();
 
             LabelledDocument document = new LabelledDocument();
 
@@ -74,13 +65,7 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
 
     @Override
     public void reset() {
-
-        try {
-            position.set(1); //Probably?
-            rowSet.beforeFirst();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        position.set(0);
     }
 
     @Override
@@ -89,7 +74,7 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
     }
 
     public static class Builder {
-        protected ResultSet rowSet = null;
+        protected List<DocItem> rowSet = null;
 
         public Builder() {
 
@@ -102,7 +87,7 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
          * @param rs RowSet to be scanned for docId and docContent
          * @return
          */
-        public Builder setRowSet(@NonNull ResultSet rs) {
+        public Builder setRowSet(@NonNull List rs) {
             this.rowSet = rs;
             return this;
         }
@@ -111,15 +96,9 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
             // search for all files in all folders provided
             List<String> labels = new ArrayList<>();
 
-            try {
-                rowSet.beforeFirst();
-
-                while(rowSet.next()){
-                    String label = rowSet.getString(1);
-                    labels.add(label);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            for (DocItem item : rowSet) {
+                String label = item.getDocId();
+                labels.add(label);
             }
 
             LabelsSource source = new LabelsSource(labels);
@@ -130,7 +109,7 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
     }
 
     public static void main(String[] args) {
-        ResultSet rs = LoadDataFromDB.loadDataFromSqlite(null, null);
+        List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, null);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
                 .setRowSet(rs)
                 .build();
