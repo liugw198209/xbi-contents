@@ -32,7 +32,7 @@ public class Article2VectorTraining {
 
     public static void main(String[] args) throws Exception {
         String inputSql = "select id, post_content from xb_corpus limit 100";
-        List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, inputSql);
+        List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, null);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
                 .setRowSet(rs)
                 .build();
