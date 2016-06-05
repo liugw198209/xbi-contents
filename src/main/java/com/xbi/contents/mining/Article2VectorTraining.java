@@ -53,7 +53,7 @@ public class Article2VectorTraining {
                 .minWordFrequency(5)
                 .iterations(5)
                 .epochs(3)
-                .layerSize(100)
+                .layerSize(50)
                 .learningRate(0.025)
                 .windowSize(5)
                 .iterate(iterator)
