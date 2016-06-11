@@ -57,7 +57,7 @@ public class Article2VectorTraining {
                 .learningRate(0.025)
                 .windowSize(5)
                 .iterate(iterator)
-                .trainWordVectors(true)
+                .trainWordVectors(false)
                 .vocabCache(cache)
                 .tokenizerFactory(t)
                 .sampling(0)
