@@ -38,7 +38,11 @@ public class JapaneseTokenizer implements Tokenizer {
 		tokens = tokenizer.tokenize(text);
 	}
 	
-	private static org.atilika.kuromoji.Tokenizer tokenizer = org.atilika.kuromoji.Tokenizer.builder().build();
+	private static org.atilika.kuromoji.Tokenizer tokenizer = org.atilika.kuromoji.Tokenizer.builder()
+			.mode(org.atilika.kuromoji.Tokenizer.Mode.NORMAL)
+			.split(true)
+			.build();
+
 	private TokenPreProcess tokenPreProcess;
 	
 	@Override
@@ -51,11 +55,38 @@ public class JapaneseTokenizer implements Tokenizer {
 		return tokens.size();
 	}
 
+	private boolean isBlackToken(Token token){
+		String pos = token.getPartOfSpeech();
+
+		if(pos.startsWith("記号") || pos.startsWith("助詞") || pos.startsWith("助動詞"))
+			return true;
+		else
+			return  false;
+	}
+
+	private boolean isWhiteToken(Token token){
+		String pos = token.getPartOfSpeech();
+
+		if(pos.startsWith("名詞") || pos.startsWith("動詞") || pos.startsWith("形容詞"))
+			return true;
+		else
+			return  false;
+	}
+
 	@Override
 	public String nextToken() {
+		if(!hasMoreTokens()) return null;
+
 		Token token = tokens.get(position.getAndIncrement());
+		if(isBlackToken(token)){
+			return nextToken();
+		}
 		String base = token.getSurfaceForm();
-        if(tokenPreProcess != null)
+		if(base.length() > 20) {
+			System.out.println("too long: " + base);
+			return nextToken();
+		}
+		if(tokenPreProcess != null)
             base = tokenPreProcess.preProcess(base);
         return base;
 	}
@@ -64,7 +95,9 @@ public class JapaneseTokenizer implements Tokenizer {
 	public List<String> getTokens() {
 		List<String> tokens = new ArrayList<>();
 		while(hasMoreTokens()) {
-			tokens.add(nextToken());
+			String tkn = nextToken();
+			if(tkn != null)
+				tokens.add(tkn);
 		}
 		return tokens;
 	}
@@ -74,8 +107,4 @@ public class JapaneseTokenizer implements Tokenizer {
 		this.tokenPreProcess = tokenPreProcessor;
 		
 	}
-	
-	
-
-	
 }

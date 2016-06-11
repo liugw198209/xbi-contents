@@ -8,7 +8,6 @@ import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache;
 import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
-import org.deeplearning4j.text.documentiterator.LabelledDocument;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.slf4j.Logger;
@@ -31,8 +30,10 @@ public class Article2VectorTraining {
     private static final Logger log = LoggerFactory.getLogger(Article2VectorTraining.class);
 
     public static void main(String[] args) throws Exception {
-        String inputSql = "select id, post_content from xb_corpus limit 100";
-        List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, null);
+        //String inputSql = "select id, post_content from xb_corpus where post_length < 10000 limit 1000";
+        String inputSql = "select id, post_content from xb_corpus where post_length < 10000";
+
+        List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, inputSql);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
                 .setRowSet(rs)
                 .build();
@@ -50,14 +51,14 @@ public class Article2VectorTraining {
         */
 
         ParagraphVectors vec = new ParagraphVectors.Builder()
-                .minWordFrequency(5)
-                .iterations(5)
-                .epochs(3)
+                .minWordFrequency(3)
+                .iterations(1)
+                .epochs(1)
                 .layerSize(50)
                 .learningRate(0.025)
                 .windowSize(5)
                 .iterate(iterator)
-                .trainWordVectors(false)
+                .trainWordVectors(true)
                 .vocabCache(cache)
                 .tokenizerFactory(t)
                 .sampling(0)
@@ -71,6 +72,10 @@ public class Article2VectorTraining {
         WordVectorSerializer.writeWordVectors(vec, "article2vec.txt");
         //WordVectorSerializer.writeFullModel(vec, "fullmodel.txt");
 
+        //UiServer server = UiServer.getInstance();
+        //System.out.println("Started on port " + server.getPort());
+
+        /*
         iterator.reset();
         LabelledDocument doc1 = iterator.nextDocument();
         LabelledDocument doc2 = iterator.nextDocument();
@@ -85,8 +90,7 @@ public class Article2VectorTraining {
         double sim6 = vec.similarityToLabel(doc2.getLabel(), doc2.getLabel());
 
         log.info(sim1 + "," + sim2 + "," + sim5 + "," + sim6);
-        //double similarity1 = vec.similarity("DOC_9835", "DOC_12492");
-        //log.info("9835/12492 similarity: " + similarity1);
 
+        */
     }
 }
