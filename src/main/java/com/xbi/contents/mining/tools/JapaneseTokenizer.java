@@ -78,11 +78,11 @@ public class JapaneseTokenizer implements Tokenizer {
 		if(!hasMoreTokens()) return null;
 
 		Token token = tokens.get(position.getAndIncrement());
-		if(isBlackToken(token)){
-			return nextToken();
-		}
+//		if(isBlackToken(token)){
+//			return nextToken();
+//		}
 		String base = token.getSurfaceForm();
-		if(base.length() > 20) {
+		if(base.length() > 30) {
 			System.out.println("too long: " + base);
 			return nextToken();
 		}

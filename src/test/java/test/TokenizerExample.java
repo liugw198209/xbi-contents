@@ -12,7 +12,7 @@ public class TokenizerExample {
                 .mode(Tokenizer.Mode.NORMAL)
                 .split(true)
                 .build();
-        for (Token token : tokenizer.tokenize("寿司を食べたい。国際|関西空港と関西国際空港、LSTM深層学習")) {
+        for (Token token : tokenizer.tokenize("寿司を食べたい。C#,国際|関西空港と関西国際空港、LSTM深層学習")) {
             System.out.println(token.getSurfaceForm() + "\t" + token.getBaseForm() + "\t" + token.getPartOfSpeech() + "\t" +token.isKnown() + "\t" + token.getPosition());
             //System.out.println(token.getSurfaceForm() + "\t" + token.getAllFeatures());
         }

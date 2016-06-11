@@ -46,7 +46,8 @@ public class LoadDataFromDB {
                 String postId = rs.getString(1);
 
                 if(i < 10){
-                    System.out.println(postId + "," + filterContent.substring(0, 20));
+                    Integer len = Math.min(filterContent.length(), 100);
+                    System.out.println(postId + "," + filterContent.substring(0, len));
                 }
                 i++;
 
