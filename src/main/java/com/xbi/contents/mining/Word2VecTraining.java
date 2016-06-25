@@ -1,9 +1,6 @@
 package com.xbi.contents.mining;
 
-import com.xbi.contents.mining.tools.DocItem;
-import com.xbi.contents.mining.tools.JapaneseTokenizerFactory;
-import com.xbi.contents.mining.tools.LoadDataFromDB;
-import com.xbi.contents.mining.tools.RowIterator;
+import com.xbi.contents.mining.tools.*;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
@@ -30,12 +27,13 @@ public class Word2VecTraining {
         SentenceIterator iter = new RowIterator(rs);
         // Split on white spaces in the line to get words
         TokenizerFactory t = new JapaneseTokenizerFactory();
-        //t.setTokenPreProcessor(new CommonPreprocessor());
+        t.setTokenPreProcessor(new JapanesePreProcess());
 
         log.info("Building model....");
         Word2Vec vec = new Word2Vec.Builder()
                 .minWordFrequency(3)
-                .iterations(1)
+                .iterations(2)
+                .epochs(2)
                 .layerSize(100)
                 .seed(42)
                 .windowSize(5)
