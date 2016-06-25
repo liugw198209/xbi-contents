@@ -39,11 +39,15 @@ public class LoadDataFromDB {
             statement = connection.createStatement();
 
             rs = statement.executeQuery(query);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
             int i = 0;
             while (rs.next()) {
                 Matcher m = ptn.matcher(rs.getString(2));
                 String filterContent = m.replaceAll("");
                 String postId = rs.getString(1);
+
+                String postTitle = columnsNumber == 3 ? rs.getString(3) : null;
 
                 if(i < 10){
                     Integer len = Math.min(filterContent.length(), 100);
@@ -51,7 +55,7 @@ public class LoadDataFromDB {
                 }
                 i++;
 
-                rowSet.add(new DocItem(postId, filterContent));
+                rowSet.add(new DocItem(postId, filterContent, postTitle));
             }
 
         } catch (ClassNotFoundException e) {

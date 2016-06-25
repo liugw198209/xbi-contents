@@ -6,12 +6,26 @@ package com.xbi.contents.mining.tools;
 public class DocItem {
     private String docId;
     private String docContent;
+    private String docTitle;
+    private String docCategory;
 
     public DocItem(String docId, String docContent) {
         this.docId = docId;
         this.docContent = docContent;
     }
 
+    public DocItem(String docId, String docContent, String docTitle) {
+        this.docId = docId;
+        this.docContent = docContent;
+        this.setDocTitle(docTitle);
+    }
+
+    public DocItem(String docId, String docContent, String docTitle, String docCategory) {
+        this.docId = docId;
+        this.docContent = docContent;
+        this.setDocTitle(docTitle);
+        this.setDocCategory(docCategory);
+    }
 
     public String getDocId() {
         return docId;
@@ -30,4 +44,19 @@ public class DocItem {
     }
 
 
+    public String getDocTitle() {
+        return docTitle;
+    }
+
+    public void setDocTitle(String docTitle) {
+        this.docTitle = docTitle;
+    }
+
+    public String getDocCategory() {
+        return docCategory;
+    }
+
+    public void setDocCategory(String docCategory) {
+        this.docCategory = docCategory;
+    }
 }

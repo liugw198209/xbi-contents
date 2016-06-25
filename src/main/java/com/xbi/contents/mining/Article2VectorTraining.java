@@ -30,8 +30,8 @@ public class Article2VectorTraining {
     private static final Logger log = LoggerFactory.getLogger(Article2VectorTraining.class);
 
     public static void main(String[] args) throws Exception {
-        //String inputSql = "select id, post_title from xb_corpus where post_length < 10000 limit 100";
-        String inputSql = "select id, post_title from xb_corpus where post_length < 10000";
+        String inputSql = "select id, post_title from xb_corpus where post_length < 10000 limit 100";
+        //String inputSql = "select id, post_title from xb_corpus where post_length < 10000";
 
         List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, inputSql);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
@@ -52,9 +52,9 @@ public class Article2VectorTraining {
 
         ParagraphVectors vec = new ParagraphVectors.Builder()
                 .minWordFrequency(2)
-                .iterations(5)
-                .epochs(10)
-                .layerSize(100)
+                .iterations(1)
+                .epochs(1)
+                .layerSize(50)
                 .learningRate(0.025)
                 .windowSize(5)
                 .iterate(iterator)
