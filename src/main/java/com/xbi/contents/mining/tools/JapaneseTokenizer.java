@@ -83,7 +83,7 @@ public class JapaneseTokenizer implements Tokenizer {
 //		}
 		String base = token.getSurfaceForm();
 		if(base.length() > 30) {
-			System.out.println("too long: " + base);
+			System.out.println("skipped (too long): " + base);
 			return nextToken();
 		}
 		if(tokenPreProcess != null)
