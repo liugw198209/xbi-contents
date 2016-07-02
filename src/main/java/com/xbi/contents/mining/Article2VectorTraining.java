@@ -10,6 +10,7 @@ import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache
 import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+import org.deeplearning4j.ui.UiServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class Article2VectorTraining {
     private static final Logger log = LoggerFactory.getLogger(Article2VectorTraining.class);
 
     public static void main(String[] args) throws Exception {
-        String inputSql = "select id, post_content from xb_corpus where post_length < 10000 limit 10000";
+        String inputSql = "select id, post_content from xb_corpus where post_length < 10000 limit 1000";
         //String inputSql = "select id, post_title from xb_corpus where post_length < 10000";
 
         List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, inputSql);
@@ -50,11 +51,14 @@ public class Article2VectorTraining {
               But if you have LabelAwareIterator ready, you can can provide it, for your in-house labels
         */
 
+        UiServer server = UiServer.getInstance();
+        System.out.println("Started on port " + server.getPort());
+
         ParagraphVectors vec = new ParagraphVectors.Builder()
                 .minWordFrequency(5)
                 .iterations(1)
                 .epochs(3)
-                .layerSize(50)
+                .layerSize(100)
                 .learningRate(0.025)
                 .windowSize(7)
                 .iterate(iterator)
