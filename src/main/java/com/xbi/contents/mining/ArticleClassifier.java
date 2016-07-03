@@ -29,13 +29,13 @@ import java.io.File;
 public class ArticleClassifier {
     public static void main(String[] args) throws Exception {
         int seed = 123;
-        double learningRate = 0.001;
+        double learningRate = 0.005;
         int batchSize = 60;
-        int nEpochs = 2000;
+        int nEpochs = 500;
 
-        int numInputs = 50;
+        int numInputs = 100;
         int numOutputs = 9;
-        int numHiddenNodes = 100;
+        int numHiddenNodes = 200;
 
         //Load the training data:
         RecordReader rr = new CSVRecordReader();
