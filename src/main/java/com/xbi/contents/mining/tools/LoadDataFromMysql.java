@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public class LoadDataFromMysql {
     public static String sqlDefault = "select page_id, description from le_scourse limit 100";
-    private static Pattern ptn = Pattern.compile("^\\s+$");
+    private static Pattern ptn = Pattern.compile("\\s{2,}");
 
     public static List<DocItem> loadCourses(String sql){
         Connection connection = null;
@@ -33,9 +33,9 @@ public class LoadDataFromMysql {
             int columnsNumber = rsmd.getColumnCount();
             int i = 0;
             while (rs.next()) {
-//                Matcher m = ptn.matcher(rs.getString(2));
-//                String filterContent = m.replaceAll("");
-                String filterContent = rs.getString(2);
+                Matcher m = ptn.matcher(rs.getString(2));
+                String filterContent = m.replaceAll(" ");
+                //String filterContent = rs.getString(2);
                 String docId = rs.getString(1);
 
                 String docTitle = columnsNumber == 3 ? rs.getString(3) : null;
@@ -74,10 +74,9 @@ public class LoadDataFromMysql {
     public static void main(String[] args) throws SQLException {
         Connection con = DBManager.getConnection();
 
-        String test = "   \r\n";
+        String test = "abcr\r\n   \r\na    bd e\r\n    \r\n";
         Matcher m = ptn.matcher(test);
         String filterContent = m.replaceAll("");
-
 
         try{
             String selectSql = "select * from le_scourse limit 10";

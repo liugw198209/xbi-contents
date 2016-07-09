@@ -30,7 +30,7 @@ public class Article2VectorTraining {
     private static final Logger log = LoggerFactory.getLogger(Article2VectorTraining.class);
 
     public static void main(String[] args) throws Exception {
-        String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 100000";
+        String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 10000";
 
         List<DocItem> rs = LoadDataFromDB.loadDataFromMysql(inputSql);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
@@ -55,7 +55,7 @@ public class Article2VectorTraining {
         ParagraphVectors vec = new ParagraphVectors.Builder()
                 .minWordFrequency(3)
                 .iterations(1)
-                .epochs(30)
+                .epochs(10)
                 .layerSize(100)
                 .learningRate(0.025)
                 .windowSize(7)
