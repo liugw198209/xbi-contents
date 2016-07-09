@@ -53,7 +53,7 @@ public class ArticleClassifier {
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .learningRate(learningRate)
                 .regularization(true)
-                .l2(0.001)
+                .l2(0.0001)
                 //.learningRateDecayPolicy(LearningRatePolicy.Score)
                 //.lrPolicyDecayRate(10)
                 .updater(Updater.NESTEROVS).momentum(0.9)
@@ -91,7 +91,8 @@ public class ArticleClassifier {
             INDArray predicted = model.output(features, false);
 
             eval.eval(lables, predicted);
-
+            System.out.println(predicted);
+            System.out.println(lables);
         }
 
         //Print the evaluation statistics
