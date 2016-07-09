@@ -30,10 +30,9 @@ public class Article2VectorTraining {
     private static final Logger log = LoggerFactory.getLogger(Article2VectorTraining.class);
 
     public static void main(String[] args) throws Exception {
-        String inputSql = "select id, post_content from xb_corpus where post_length < 10000 limit 10000";
-        //String inputSql = "select id, post_title from xb_corpus where post_length < 10000";
+        String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 100000";
 
-        List<DocItem> rs = LoadDataFromDB.loadDataFromSqlite(null, inputSql);
+        List<DocItem> rs = LoadDataFromDB.loadDataFromMysql(inputSql);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
                 .setRowSet(rs)
                 .build();
@@ -54,12 +53,12 @@ public class Article2VectorTraining {
         //System.out.println("Started on port " + server.getPort());
 
         ParagraphVectors vec = new ParagraphVectors.Builder()
-                .minWordFrequency(5)
+                .minWordFrequency(3)
                 .iterations(1)
                 .epochs(30)
-                .layerSize(200)
+                .layerSize(100)
                 .learningRate(0.025)
-                .windowSize(11)
+                .windowSize(7)
                 .iterate(iterator)
                 .trainWordVectors(false)
                 .vocabCache(cache)
@@ -72,7 +71,7 @@ public class Article2VectorTraining {
         log.info("Writing word vectors to text file....");
 
         // Write word vectors
-        WordVectorSerializer.writeWordVectors(vec, "article2vec.txt");
+        WordVectorSerializer.writeWordVectors(vec, "course2vec.txt");
         //WordVectorSerializer.writeFullModel(vec, "fullmodel.txt");
 
         /*

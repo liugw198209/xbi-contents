@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public class LoadDataFromMysql {
     public static String sqlDefault = "select page_id, description from le_scourse limit 100";
-    private static Pattern ptn = Pattern.compile("^\\s*$");
+    private static Pattern ptn = Pattern.compile("^\\s+$");
 
     public static List<DocItem> loadCourses(String sql){
         Connection connection = null;

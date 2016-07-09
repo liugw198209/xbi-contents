@@ -20,6 +20,10 @@ public class LoadDataFromDB {
         assert(rs.size() > 0);
     }
 
+    public static List<DocItem> loadDataFromMysql(String sql){
+        return LoadDataFromMysql.loadCourses(sql);
+    }
+
     public static List<DocItem> loadDataFromSqlite(String connString, String sql){
         Connection connection = null;
         Statement statement = null;
