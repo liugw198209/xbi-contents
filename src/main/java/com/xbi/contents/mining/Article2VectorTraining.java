@@ -55,7 +55,7 @@ public class Article2VectorTraining {
         ParagraphVectors vec = new ParagraphVectors.Builder()
                 .minWordFrequency(3)
                 .iterations(5)
-                .epochs(20)
+                .epochs(100)
                 .layerSize(100)
                 .learningRate(0.025)
                 .windowSize(9)
