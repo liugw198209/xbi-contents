@@ -4,15 +4,22 @@ import com.xbi.contents.mining.tools.DocItem;
 import com.xbi.contents.mining.tools.JapaneseTokenizerFactory;
 import com.xbi.contents.mining.tools.LoadDataFromDB;
 import com.xbi.contents.mining.tools.RowLabelAwareIterator;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
+import lombok.NonNull;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
+import org.deeplearning4j.models.word2vec.VocabWord;
+import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache;
 import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 /**
@@ -28,6 +35,7 @@ import java.util.List;
 public class Course2VectorTraining {
 
     private static final Logger log = LoggerFactory.getLogger(Course2VectorTraining.class);
+    private static final String whitespaceReplacement = "_Az92_";
 
     public static void main(String[] args) throws Exception {
         String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 100000";
@@ -68,10 +76,10 @@ public class Course2VectorTraining {
 
         vec.fit();
 
-        log.info("Writing word vectors to text file....");
+        log.info("Writing course vectors to text file....");
 
         // Write word vectors
-        WordVectorSerializer.writeWordVectors(vec, "course2vec.txt");
+        writeWordVectors(vec, "course2vec.txt");
         //WordVectorSerializer.writeFullModel(vec, "fullmodel.txt");
 
         /*
@@ -92,4 +100,47 @@ public class Course2VectorTraining {
 
         */
     }
+
+    public static void writeWordVectors(@NonNull ParagraphVectors vectors, @NonNull String path) {
+        try (FileOutputStream fos = new FileOutputStream(path)) {
+            writeWordVectors(vectors, fos);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeWordVectors(ParagraphVectors vectors, OutputStream stream) {
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream, "UTF-8"))) {
+        /*
+            This method acts similary to w2v csv serialization, except of additional tag for labels
+         */
+
+            VocabCache<VocabWord> vocabCache = vectors.getVocab();
+            for (VocabWord word : vocabCache.vocabWords()) {
+                if(word.isLabel()) { // Paragraph Vector only
+                    StringBuilder builder = new StringBuilder();
+
+                    builder.append(word.isLabel() ? "L" : "E").append(" ");
+                    builder.append(word.getLabel().replaceAll(" ", whitespaceReplacement)).append(" ");
+
+                    INDArray vector = vectors.getWordVectorMatrix(word.getLabel());
+                    for (int j = 0; j < vector.length(); j++) {
+                        builder.append(vector.getDouble(j));
+                        if (j < vector.length() - 1) {
+                            builder.append(" ");
+                        }
+                    }
+
+                    writer.write(builder.append("\n").toString());
+                }
+            }
+
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
