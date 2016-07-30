@@ -5,6 +5,7 @@ import com.xbi.contents.mining.tools.JapaneseTokenizerFactory;
 import com.xbi.contents.mining.tools.LoadDataFromDB;
 import com.xbi.contents.mining.tools.RowLabelAwareIterator;
 import lombok.NonNull;
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
@@ -36,6 +37,7 @@ public class Course2VectorTraining {
 
     private static final Logger log = LoggerFactory.getLogger(Course2VectorTraining.class);
     private static final String whitespaceReplacement = "_Az92_";
+    private static final Boolean isTrainWords = false;
 
     public static void main(String[] args) throws Exception {
         String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 100000";
@@ -68,7 +70,7 @@ public class Course2VectorTraining {
                 .learningRate(0.025)
                 .windowSize(9)
                 .iterate(iterator)
-                .trainWordVectors(false)
+                .trainWordVectors(isTrainWords)
                 .vocabCache(cache)
                 .tokenizerFactory(t)
                 .sampling(0)
@@ -79,7 +81,12 @@ public class Course2VectorTraining {
         log.info("Writing course vectors to text file....");
 
         // Write word vectors
-        writeWordVectors(vec, "course2vec.txt");
+        if(isTrainWords){
+            WordVectorSerializer.writeWordVectors(vec, "course2vec.txt");
+        }
+        else {
+            writeWordVectors(vec, "course2vec.txt");
+        }
         //WordVectorSerializer.writeFullModel(vec, "fullmodel.txt");
 
         /*
