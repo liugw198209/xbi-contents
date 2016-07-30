@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * Created by usr0101862 on 2016/07/02.
  */
-public class ArticleClassifier {
+public class CourseClassifier {
     public static void main(String[] args) throws Exception {
         int seed = 123;
         double learningRate = 0.005;

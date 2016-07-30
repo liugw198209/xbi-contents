@@ -25,9 +25,9 @@ import java.util.List;
  *
  * @author Guangwen Liu
  */
-public class Article2VectorTraining {
+public class Course2VectorTraining {
 
-    private static final Logger log = LoggerFactory.getLogger(Article2VectorTraining.class);
+    private static final Logger log = LoggerFactory.getLogger(Course2VectorTraining.class);
 
     public static void main(String[] args) throws Exception {
         String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 100000";
