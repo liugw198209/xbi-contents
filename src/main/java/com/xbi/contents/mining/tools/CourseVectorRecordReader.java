@@ -11,37 +11,48 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Created by usr0101862 on 2016/07/02.
  */
-public class ArticleVectorRecordReader extends LineRecordReader {
+public class CourseVectorRecordReader extends LineRecordReader {
 
     private boolean skippedLines;
     private int skipNumLines;
     private String delimiter;
     public static final String SKIP_NUM_LINES;
     public static final String DELIMITER;
+    private HashMap<String, Integer> labeledDocs = null;
 
-    public ArticleVectorRecordReader(int skipNumLines) {
+    public CourseVectorRecordReader(int skipNumLines) {
         this(skipNumLines, ",");
     }
 
-    public ArticleVectorRecordReader(int skipNumLines, String delimiter) {
+    public CourseVectorRecordReader(int skipNumLines, String delimiter) {
         this.skippedLines = false;
         this.skipNumLines = 0;
         this.skipNumLines = skipNumLines;
         this.delimiter = delimiter;
     }
 
-    public ArticleVectorRecordReader() {
+    public CourseVectorRecordReader() {
         this(0, ",");
+    }
+
+    public HashMap<String, Integer> getLabeledDocs() {
+        return labeledDocs;
     }
 
     public void initialize(Configuration conf, InputSplit split) throws IOException, InterruptedException {
         super.initialize(conf, split);
         this.skipNumLines = conf.getInt(SKIP_NUM_LINES, this.skipNumLines);
         this.delimiter = conf.get(DELIMITER, ",");
+    }
+
+    public void initialize(InputSplit split, HashMap<String, Integer> labels) throws IOException, InterruptedException {
+        super.initialize(split);
+        labeledDocs = labels;
     }
 
     public Collection<Writable> next() {
@@ -60,16 +71,34 @@ public class ArticleVectorRecordReader extends LineRecordReader {
         Text var9 = (Text)super.next().iterator().next();
         String val = var9.toString();
         String[] split = val.split(this.delimiter, -1);
-        ArrayList ret = new ArrayList();
         String[] var5 = split;
         int var6 = split.length;
 
-        for(int var7 = 0; var7 < var6; ++var7) {
-            String s = var5[var7];
-            ret.add(new Text(s));
-        }
+        //if(var6 > 1 && labeledDocs != null){
+            String type = var5[0];
+            String id = var5[1];
 
-        return ret;
+            if(type.equals("L") && labeledDocs.containsKey(id)){
+                ArrayList ret = new ArrayList();
+
+                for(int var7 = 2; var7 < var6; ++var7) {
+                    String s = var5[var7];
+                    ret.add(new Text(s));
+                }
+
+                //add label
+                ret.add(new Text(labeledDocs.get(id).toString()));
+
+                return ret;
+            }
+        //}
+
+        if(!this.hasNext()) {
+            return new ArrayList();
+        }
+        else{
+            return this.next();
+        }
     }
 
     public Collection<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {

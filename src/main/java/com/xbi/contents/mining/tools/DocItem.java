@@ -8,6 +8,7 @@ public class DocItem {
     private String docContent;
     private String docTitle;
     private String docCategory;
+    private  String docUri;
 
     public DocItem(String docId, String docContent) {
         this.docId = docId;
@@ -25,6 +26,14 @@ public class DocItem {
         this.docContent = docContent;
         this.setDocTitle(docTitle);
         this.setDocCategory(docCategory);
+    }
+
+    public DocItem(String docId, String docContent, String docTitle, String docCategory, String docUri) {
+        this.docId = docId;
+        this.docContent = docContent;
+        this.setDocTitle(docTitle);
+        this.setDocCategory(docCategory);
+        this.setDocUri(docUri);
     }
 
     public String getDocId() {
@@ -58,5 +67,13 @@ public class DocItem {
 
     public void setDocCategory(String docCategory) {
         this.docCategory = docCategory;
+    }
+
+    public String getDocUri() {
+        return docUri;
+    }
+
+    public void setDocUri(String docUri) {
+        this.docUri = docUri;
     }
 }

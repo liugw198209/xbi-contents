@@ -1,9 +1,6 @@
 package com.xbi.contents.mining;
 
-import org.canova.api.records.reader.RecordReader;
-import org.canova.api.records.reader.impl.CSVRecordReader;
-import org.canova.api.split.FileSplit;
-import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
+import com.xbi.contents.mining.tools.CourseVectorSerializer;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -19,24 +16,26 @@ import org.deeplearning4j.ui.UiServer;
 import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.SplitTestAndTrain;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-import java.io.File;
+import java.util.List;
 
 /**
- * Created by usr0101862 on 2016/07/02.
+ * Created by Guangwen Liu on 2016/07/02.
  */
 public class CourseClassifier {
     public static void main(String[] args) throws Exception {
         int seed = 123;
         double learningRate = 0.005;
-        int batchSize = 60;
-        int nEpochs = 500;
+        int batchSize = 64;
+        int nEpochs = 200;
 
         int numInputs = 100;
         int numOutputs = 9;
         int numHiddenNodes = 200;
 
+        /*
         //Load the training data:
         RecordReader rr = new CSVRecordReader();
         rr.initialize(new FileSplit(new File("src/main/resources/doc/doc.train")));
@@ -46,6 +45,15 @@ public class CourseClassifier {
         RecordReader rrTest = new CSVRecordReader();
         rrTest.initialize(new FileSplit(new File("src/main/resources/doc/doc.test")));
         DataSetIterator testIter = new RecordReaderDataSetIterator(rrTest, batchSize, -1, numOutputs);
+        */
+
+        DataSetIterator allData = CourseVectorSerializer.loadCourseVectors();
+        numOutputs = CourseVectorSerializer.getLabelIds().size();
+
+        allData.next().shuffle();
+        SplitTestAndTrain testAndTrain = allData.next().splitTestAndTrain(0.7);
+        List<DataSet> trainIter = testAndTrain.getTrain().batchBy(batchSize);
+        List<DataSet> testIter = testAndTrain.getTest().batchBy(batchSize);
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
@@ -79,13 +87,15 @@ public class CourseClassifier {
         System.out.println("Started on port " + server.getPort());
 
         for (int n = 0; n < nEpochs; n++) {
-            model.fit(trainIter);
+            for(DataSet ds : trainIter)
+                model.fit(ds);
         }
 
         System.out.println("Evaluate model....");
         Evaluation eval = new Evaluation(numOutputs);
-        while (testIter.hasNext()) {
-            DataSet t = testIter.next();
+        //while (testIter.hasNext()) {
+        for(DataSet ds : testIter){
+            DataSet t = ds;
             INDArray features = t.getFeatureMatrix();
             INDArray lables = t.getLabels();
             INDArray predicted = model.output(features, false);
@@ -98,5 +108,6 @@ public class CourseClassifier {
         //Print the evaluation statistics
         System.out.println(eval.stats());
     }
+
 
 }

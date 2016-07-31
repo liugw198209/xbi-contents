@@ -40,7 +40,7 @@ public class Course2VectorTraining {
     private static final Boolean isTrainWords = false;
 
     public static void main(String[] args) throws Exception {
-        String inputSql = "select page_id, description from le_scourse where length(description) > 50 limit 100000";
+        String inputSql = "select page_id, description from le_scourse where length(description) > 50 order by rand() limit 2000";
 
         List<DocItem> rs = LoadDataFromDB.loadDataFromMysql(inputSql);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
@@ -64,8 +64,8 @@ public class Course2VectorTraining {
 
         ParagraphVectors vec = new ParagraphVectors.Builder()
                 .minWordFrequency(3)
-                .iterations(5)
-                .epochs(100)
+                .iterations(1)
+                .epochs(3)
                 .layerSize(100)
                 .learningRate(0.025)
                 .windowSize(9)

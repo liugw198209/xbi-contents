@@ -38,7 +38,9 @@ public class LoadDataFromMysql {
                 //String filterContent = rs.getString(2);
                 String docId = rs.getString(1);
 
-                String docTitle = columnsNumber == 3 ? rs.getString(3) : null;
+                String docTitle = columnsNumber >= 3 ? rs.getString(3) : null;
+                String docCategory = columnsNumber >= 4 ? rs.getString(4) : null;
+                String docUri = columnsNumber >= 5 ? rs.getString(5) : null;
 
                 if(i < 10){
                     Integer len = Math.min(filterContent.length(), 100);
@@ -46,7 +48,7 @@ public class LoadDataFromMysql {
                 }
                 i++;
 
-                rowSet.add(new DocItem(docId, filterContent, docTitle));
+                rowSet.add(new DocItem(docId, filterContent, docTitle, docCategory, docUri));
             }
 
         } catch (SQLException e) {
