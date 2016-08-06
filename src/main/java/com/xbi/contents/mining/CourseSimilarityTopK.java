@@ -79,7 +79,7 @@ public class CourseSimilarityTopK {
         courses = loadCourseVectorFromDB();
         topKMap = Collections.synchronizedMap(new FastHashMap(courses.size()));
 
-        Executor ex = Executors.newSingleThreadExecutor();
+        Executor ex = Executors.newCachedThreadPool();
 
         int start = 0;
         int end = 0;
@@ -88,7 +88,7 @@ public class CourseSimilarityTopK {
             end = min(start + THREAD_THROUGHPUT, courses.size());
 
             ComputeSimilarity rn = new ComputeSimilarity(start, end);
-            rn.run();
+            ex.execute(rn);
         }
 
         saveTopKSimilarity();
