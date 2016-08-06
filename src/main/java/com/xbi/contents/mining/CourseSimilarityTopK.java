@@ -10,8 +10,9 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static java.lang.Math.min;
 
@@ -79,7 +80,8 @@ public class CourseSimilarityTopK {
         courses = loadCourseVectorFromDB();
         topKMap = Collections.synchronizedMap(new FastHashMap(courses.size()));
 
-        Executor ex = Executors.newCachedThreadPool();
+        ExecutorService ex = Executors.newCachedThreadPool();
+        Collection<Future<?>> tasks = new LinkedList<Future<?>>();
 
         int start = 0;
         int end = 0;
@@ -88,7 +90,18 @@ public class CourseSimilarityTopK {
             end = min(start + THREAD_THROUGHPUT, courses.size());
 
             ComputeSimilarity rn = new ComputeSimilarity(start, end);
-            ex.execute(rn);
+            //ex.execute(rn);
+            Future<?> future = ex.submit(rn);
+            tasks.add(future);
+        }
+
+        // wait for tasks completion
+        for (Future<?> currTask : tasks) {
+            try {
+                currTask.get();
+            } catch (Throwable thrown) {
+                thrown.printStackTrace();
+            }
         }
 
         saveTopKSimilarity();
@@ -140,7 +153,7 @@ public class CourseSimilarityTopK {
         }
     }
 
-    static class ComputeSimilarity implements Runnable{
+    static class ComputeSimilarity extends Thread implements Runnable{
         private int start;
         private int end;
 
