@@ -1,6 +1,6 @@
 package com.xbi.contents.mining.examples;
 
-import org.canova.api.util.ClassPathResource;
+import org.datavec.api.util.ClassPathResource;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.inmemory.InMemoryLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
@@ -19,10 +19,10 @@ import java.util.Collection;
 
 /**
  * This is simple example for model weights update after initial vocab building.
- * If you have built your w2v model, and some time later you've decided that it can be 
+ * If you have built your w2v model, and some time later you've decided that it can be
  * additionally trained over new corpus, here's an example how to do it.
  *
- * PLEASE NOTE: At this moment, no new words will be added to vocabulary/model. 
+ * PLEASE NOTE: At this moment, no new words will be added to vocabulary/model.
  * Only weights update process will be issued. It's often called "frozen vocab training".
  *
  * @author raver119@gmail.com

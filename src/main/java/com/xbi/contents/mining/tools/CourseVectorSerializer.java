@@ -1,11 +1,11 @@
 package com.xbi.contents.mining.tools;
 
-import org.canova.api.records.reader.RecordReader;
-import org.canova.api.records.reader.impl.CSVRecordReader;
-import org.canova.api.split.FileSplit;
-import org.canova.api.writable.Writable;
-import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.iterator.DataSetIterator;
+import org.datavec.api.records.reader.RecordReader;
+import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
+import org.datavec.api.split.FileSplit;
+import org.datavec.api.writable.Writable;
+import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 import java.io.File;
 import java.io.IOException;

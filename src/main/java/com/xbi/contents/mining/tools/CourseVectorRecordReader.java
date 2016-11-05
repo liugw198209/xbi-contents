@@ -1,17 +1,18 @@
 package com.xbi.contents.mining.tools;
 
-import org.canova.api.conf.Configuration;
-import org.canova.api.io.data.Text;
-import org.canova.api.records.reader.impl.LineRecordReader;
-import org.canova.api.split.InputSplit;
-import org.canova.api.writable.Writable;
+
+import org.datavec.api.conf.Configuration;
+import org.datavec.api.records.reader.impl.LineRecordReader;
+import org.datavec.api.split.InputSplit;
+import org.datavec.api.writable.Text;
+import org.datavec.api.writable.Writable;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by usr0101862 on 2016/07/02.
@@ -55,7 +56,7 @@ public class CourseVectorRecordReader extends LineRecordReader {
         labeledDocs = labels;
     }
 
-    public Collection<Writable> next() {
+    public List<Writable> next() {
         if(!this.skippedLines && this.skipNumLines > 0) {
             for(int t = 0; t < this.skipNumLines; ++t) {
                 if(!this.hasNext()) {
@@ -101,7 +102,7 @@ public class CourseVectorRecordReader extends LineRecordReader {
         }
     }
 
-    public Collection<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
+    public List<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
         throw new UnsupportedOperationException("Reading CSV data from DataInputStream not yet implemented");
     }
 

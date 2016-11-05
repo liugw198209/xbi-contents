@@ -24,7 +24,7 @@ public class MeansBuilder {
     private TokenizerFactory tokenizerFactory;
 
     public MeansBuilder(@NonNull InMemoryLookupTable<VocabWord> lookupTable,
-        @NonNull TokenizerFactory tokenizerFactory) {
+                        @NonNull TokenizerFactory tokenizerFactory) {
         this.lookupTable = lookupTable;
         this.vocabCache = lookupTable.getVocab();
         this.tokenizerFactory = tokenizerFactory;

@@ -5,6 +5,8 @@ import com.xbi.contents.mining.tools.JapaneseTokenizerFactory;
 import com.xbi.contents.mining.tools.LoadDataFromDB;
 import com.xbi.contents.mining.tools.RowLabelAwareIterator;
 import lombok.NonNull;
+import org.deeplearning4j.models.embeddings.learning.impl.elements.CBOW;
+import org.deeplearning4j.models.embeddings.learning.impl.sequence.DM;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.VocabWord;
@@ -40,7 +42,7 @@ public class Course2VectorTraining {
     private static final Boolean isTrainWords = false;
 
     public static void main(String[] args) throws Exception {
-        String inputSql = "select page_id, description from le_scourse where length(description) > 50 order by rand() limit 2000";
+        String inputSql = "select page_id, description from le_scourse where length(description) > 50 order by rand() limit 1000";
 
         List<DocItem> rs = LoadDataFromDB.loadDataFromMysql(inputSql);
         LabelAwareIterator iterator = new RowLabelAwareIterator.Builder()
@@ -68,12 +70,17 @@ public class Course2VectorTraining {
                 .epochs(3)
                 .layerSize(100)
                 .learningRate(0.025)
-                .windowSize(9)
+                .windowSize(7)
+                .sequenceLearningAlgorithm(new DM<VocabWord>())
+//                .sequenceLearningAlgorithm(new DBOW<VocabWord>()) //default
+                .elementsLearningAlgorithm(new CBOW<VocabWord>())
+//                .elementsLearningAlgorithm(new SkipGram<VocabWord>()) //default
                 .iterate(iterator)
                 .trainWordVectors(isTrainWords)
                 .vocabCache(cache)
                 .tokenizerFactory(t)
                 .sampling(0)
+                .workers(2)
                 .build();
 
         vec.fit();

@@ -1,5 +1,6 @@
 package com.xbi.contents.mining.examples;
 
+import org.datavec.api.util.ClassPathResource;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.inmemory.InMemoryLookupTable;
 import org.deeplearning4j.models.embeddings.learning.impl.elements.SkipGram;
@@ -16,7 +17,6 @@ import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFac
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 
@@ -65,7 +65,7 @@ public class SequenceVectorsTextExample {
             And we pack that transformer into AbstractSequenceIterator
          */
         AbstractSequenceIterator<VocabWord> sequenceIterator =
-            new AbstractSequenceIterator.Builder<>(transformer).build();
+                new AbstractSequenceIterator.Builder<>(transformer).build();
 
 
         /*
