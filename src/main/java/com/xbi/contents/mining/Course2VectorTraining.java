@@ -65,12 +65,12 @@ public class Course2VectorTraining {
         //System.out.println("Started on port " + server.getPort());
 
         ParagraphVectors vec = new ParagraphVectors.Builder()
-                .minWordFrequency(3)
-                .iterations(3)
-                .epochs(100)
+                .minWordFrequency(4)
+                .iterations(2)
+                .epochs(30)
                 .layerSize(100)
                 .learningRate(0.025)
-                .windowSize(11)
+                .windowSize(5)
                 .sequenceLearningAlgorithm(new DM<VocabWord>())
 //                .sequenceLearningAlgorithm(new DBOW<VocabWord>()) //default
 //                .elementsLearningAlgorithm(new CBOW<VocabWord>())
@@ -81,6 +81,7 @@ public class Course2VectorTraining {
                 .tokenizerFactory(t)
                 .sampling(0)
                 .workers(8)
+                .batchSize(100)
                 .build();
 
         vec.fit();
