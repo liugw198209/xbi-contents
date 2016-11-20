@@ -66,8 +66,8 @@ public class Course2VectorTraining {
 
         ParagraphVectors vec = new ParagraphVectors.Builder()
                 .minWordFrequency(4)
-                .iterations(2)
-                .epochs(30)
+                .iterations(3)
+                .epochs(50)
                 .layerSize(100)
                 .learningRate(0.025)
                 .windowSize(5)
