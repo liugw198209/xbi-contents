@@ -26,6 +26,9 @@ public class CourseVectorRecordReader extends LineRecordReader {
     public static final String DELIMITER;
     private HashMap<String, Integer> labeledDocs = null;
 
+    private ArrayList buffered = new ArrayList();
+    private int currIndex = 0;
+
     public CourseVectorRecordReader(int skipNumLines) {
         this(skipNumLines, ",");
     }
@@ -51,12 +54,56 @@ public class CourseVectorRecordReader extends LineRecordReader {
         this.delimiter = conf.get(DELIMITER, ",");
     }
 
-    public void initialize(InputSplit split, HashMap<String, Integer> labels) throws IOException, InterruptedException {
-        super.initialize(split);
+    public void initialize(InputSplit inputSplit, HashMap<String, Integer> labels) throws IOException, InterruptedException {
+        super.initialize(inputSplit);
         labeledDocs = labels;
+
+        while(super.hasNext()) {
+            Text var9 = (Text) super.next().iterator().next();
+            String val = var9.toString();
+            String[] split = val.split(this.delimiter, -1);
+            String[] var5 = split;
+            int var6 = split.length;
+
+            //if(var6 > 1 && labeledDocs != null){
+            String type = var5[0];
+            String id = var5[1];
+
+            if (type.equals("L") && labeledDocs.containsKey(id)) {
+                ArrayList ret = new ArrayList();
+                System.out.println("id=" + id);
+
+                for (int var7 = 2; var7 < var6; ++var7) {
+                    String s = var5[var7];
+                    ret.add(new Text(s));
+                }
+
+                //add label
+                ret.add(new Text(labeledDocs.get(id).toString()));
+
+                buffered.add(ret);
+            }
+        }
     }
 
-    public List<Writable> next() {
+    synchronized public List<Writable> next() {
+        if(currIndex < buffered.size())
+            return (List<Writable>) buffered.get(currIndex++);
+        else
+            return new ArrayList<>();
+    }
+
+    @Override
+    synchronized public boolean hasNext(){
+        return this.currIndex < buffered.size();
+    }
+
+    @Override
+    synchronized public void reset(){
+        this.currIndex = 0;
+    }
+
+    /*public List<Writable> next() {
         if(!this.skippedLines && this.skipNumLines > 0) {
             for(int t = 0; t < this.skipNumLines; ++t) {
                 if(!this.hasNext()) {
@@ -81,6 +128,7 @@ public class CourseVectorRecordReader extends LineRecordReader {
 
             if(type.equals("L") && labeledDocs.containsKey(id)){
                 ArrayList ret = new ArrayList();
+                System.out.println("id=" + id);
 
                 for(int var7 = 2; var7 < var6; ++var7) {
                     String s = var5[var7];
@@ -100,7 +148,7 @@ public class CourseVectorRecordReader extends LineRecordReader {
         else{
             return this.next();
         }
-    }
+    }*/
 
     public List<Writable> record(URI uri, DataInputStream dataInputStream) throws IOException {
         throw new UnsupportedOperationException("Reading CSV data from DataInputStream not yet implemented");

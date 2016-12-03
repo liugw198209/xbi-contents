@@ -29,7 +29,7 @@ public class CourseClassifier {
         int seed = 123;
         double learningRate = 0.005;
         int batchSize = 64;
-        int nEpochs = 200;
+        int nEpochs = 100;
 
         int numInputs = 100;
         int numOutputs = 9;
@@ -50,8 +50,8 @@ public class CourseClassifier {
         DataSetIterator allData = CourseVectorSerializer.loadCourseVectors();
         numOutputs = CourseVectorSerializer.getLabelIds().size();
 
-        allData.next().shuffle();
-        SplitTestAndTrain testAndTrain = allData.next().splitTestAndTrain(0.7);
+       // allData.next().shuffle();
+        SplitTestAndTrain testAndTrain = allData.next().splitTestAndTrain(0.75);
         List<DataSet> trainIter = testAndTrain.getTrain().batchBy(batchSize);
         List<DataSet> testIter = testAndTrain.getTest().batchBy(batchSize);
 
@@ -107,6 +107,22 @@ public class CourseClassifier {
 
         //Print the evaluation statistics
         System.out.println(eval.stats());
+
+        //for training data
+        System.out.println("Evaluate model....(for train data)");
+        eval = new Evaluation(numOutputs);
+        for(DataSet ds : trainIter){
+            DataSet t = ds;
+            INDArray features = t.getFeatureMatrix();
+            INDArray lables = t.getLabels();
+            INDArray predicted = model.output(features, false);
+
+            eval.eval(lables, predicted);
+        }
+
+        //Print the evaluation statistics
+        System.out.println(eval.stats());
+
     }
 
 

@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CourseVectorSerializer {
     //public int batchSize = 32;
-    public static String inputFilePath = "course2vec.txt"; //"src/main/resources/doc/doc.train";
+    public static String inputFilePath = "course2vec.txt.dm"; //"src/main/resources/doc/doc.train";
     private static HashMap<String, Integer> labelIds = null;
     protected static AtomicInteger IDG = new AtomicInteger(0);
     private static DataSetIterator fullDataSet = null;
