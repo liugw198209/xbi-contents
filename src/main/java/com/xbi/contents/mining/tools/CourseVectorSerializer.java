@@ -65,7 +65,6 @@ public class CourseVectorSerializer {
         System.out.println("totalExamples: " + examples);
         int labelNum = getLabelIds().size();
         fullDataSet = new RecordReaderDataSetIterator(rr, examples, -1, labelNum);
-
         return fullDataSet;
     }
 

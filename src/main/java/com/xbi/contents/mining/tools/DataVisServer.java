@@ -1,6 +1,6 @@
 package com.xbi.contents.mining.tools;
 
-import org.deeplearning4j.ui.UiServer;
+import org.deeplearning4j.ui.api.UIServer;
 
 /**
  * Created by usr0101862 on 2016/06/12.
@@ -8,7 +8,7 @@ import org.deeplearning4j.ui.UiServer;
 public class DataVisServer {
 
     public static void main(String[] args) throws Exception {
-        UiServer server = UiServer.getInstance();
+        UIServer server = UIServer.getInstance();
         System.out.println("Started on port " + server.getPort());
     }
 

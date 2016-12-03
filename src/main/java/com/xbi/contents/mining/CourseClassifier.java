@@ -1,7 +1,14 @@
 package com.xbi.contents.mining;
 
 import com.xbi.contents.mining.tools.CourseVectorSerializer;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator;
+import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
+import org.deeplearning4j.earlystopping.EarlyStoppingResult;
+import org.deeplearning4j.earlystopping.saver.InMemoryModelSaver;
+import org.deeplearning4j.earlystopping.scorecalc.DataSetLossCalculator;
+import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.MaxTimeIterationTerminationCondition;
+import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -12,14 +19,17 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.ui.UiServer;
+import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.weights.HistogramIterationListener;
+import org.joda.time.DateTime;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.SplitTestAndTrain;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Guangwen Liu on 2016/07/02.
@@ -29,7 +39,7 @@ public class CourseClassifier {
         int seed = 123;
         double learningRate = 0.005;
         int batchSize = 64;
-        int nEpochs = 100;
+        int nEpochs = 500;
 
         int numInputs = 100;
         int numOutputs = 9;
@@ -50,7 +60,7 @@ public class CourseClassifier {
         DataSetIterator allData = CourseVectorSerializer.loadCourseVectors();
         numOutputs = CourseVectorSerializer.getLabelIds().size();
 
-       // allData.next().shuffle();
+        //allData.next().shuffle();
         SplitTestAndTrain testAndTrain = allData.next().splitTestAndTrain(0.75);
         List<DataSet> trainIter = testAndTrain.getTrain().batchBy(batchSize);
         List<DataSet> testIter = testAndTrain.getTest().batchBy(batchSize);
@@ -83,14 +93,48 @@ public class CourseClassifier {
         model.setListeners(new ScoreIterationListener(1));
         model.setListeners(new HistogramIterationListener(1));
 
-        UiServer server = UiServer.getInstance();
+        UIServer server = UIServer.getInstance();
         System.out.println("Started on port " + server.getPort());
 
-        for (int n = 0; n < nEpochs; n++) {
-            for(DataSet ds : trainIter)
-                model.fit(ds);
-        }
+//        for (int n = 0; n < nEpochs; n++) {
+//            for(DataSet ds : trainIter)
+//                model.fit(ds);
+//        }
 
+        EarlyStoppingConfiguration esConf = new EarlyStoppingConfiguration.Builder()
+                .epochTerminationConditions(new MaxEpochsTerminationCondition(nEpochs))
+                .iterationTerminationConditions(new MaxTimeIterationTerminationCondition(20, TimeUnit.MINUTES))
+                .scoreCalculator(new DataSetLossCalculator(new ListDataSetIterator(testIter), true))
+                .evaluateEveryNEpochs(5)
+                .modelSaver(new InMemoryModelSaver<>())
+                .build();
+
+        EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(esConf,conf, new ListDataSetIterator(trainIter, batchSize));
+
+//Conduct early stopping training:
+        EarlyStoppingResult result = trainer.fit();
+
+//Print out the results:
+        System.out.println("Termination reason: " + result.getTerminationReason());
+        System.out.println("Termination details: " + result.getTerminationDetails());
+        System.out.println("Total epochs: " + result.getTotalEpochs());
+        System.out.println("Best epoch number: " + result.getBestModelEpoch());
+        System.out.println("Score at best epoch: " + result.getBestModelScore());
+
+//Get the best model:
+        MultiLayerNetwork bestModel = (MultiLayerNetwork) result.getBestModel();
+
+        System.out.println("For test data");
+        evalModel(bestModel, numOutputs, testIter, false);
+
+        System.out.println("For train data");
+        evalModel(bestModel, numOutputs, trainIter, false);
+
+
+        System.out.println("Finished: " + DateTime.now());
+    }
+
+    static void evalModel(MultiLayerNetwork model, int numOutputs, List<DataSet> testIter, boolean isPrintDetail){
         System.out.println("Evaluate model....");
         Evaluation eval = new Evaluation(numOutputs);
         //while (testIter.hasNext()) {
@@ -101,29 +145,15 @@ public class CourseClassifier {
             INDArray predicted = model.output(features, false);
 
             eval.eval(lables, predicted);
-            System.out.println(predicted);
-            System.out.println(lables);
+
+            if(isPrintDetail){
+                System.out.println(predicted);
+                System.out.println(lables);
+            }
         }
 
         //Print the evaluation statistics
         System.out.println(eval.stats());
-
-        //for training data
-        System.out.println("Evaluate model....(for train data)");
-        eval = new Evaluation(numOutputs);
-        for(DataSet ds : trainIter){
-            DataSet t = ds;
-            INDArray features = t.getFeatureMatrix();
-            INDArray lables = t.getLabels();
-            INDArray predicted = model.output(features, false);
-
-            eval.eval(lables, predicted);
-        }
-
-        //Print the evaluation statistics
-        System.out.println(eval.stats());
-
     }
-
 
 }

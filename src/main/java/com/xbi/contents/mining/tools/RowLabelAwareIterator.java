@@ -43,7 +43,6 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
         return(this.position.get() < this.rowSet.size());
     }
 
-
     @Override
     public LabelledDocument nextDocument() {
 
@@ -66,6 +65,26 @@ public class RowLabelAwareIterator implements LabelAwareIterator {
     @Override
     public void reset() {
         position.set(0);
+    }
+
+    @Override
+    public boolean hasNext() {
+        return hasNextDocument();
+    }
+
+    @Override
+    public LabelledDocument next() {
+        return nextDocument();
+    }
+
+    @Override
+    public void remove() {
+        // no-op
+    }
+
+    @Override
+    public void shutdown() {
+        // no-op
     }
 
     @Override
