@@ -57,6 +57,7 @@ public class CourseVectorRecordReader extends LineRecordReader {
     public void initialize(InputSplit inputSplit, HashMap<String, Integer> labels) throws IOException, InterruptedException {
         super.initialize(inputSplit);
         labeledDocs = labels;
+        buffered.clear();
 
         while(super.hasNext()) {
             Text var9 = (Text) super.next().iterator().next();
@@ -69,9 +70,9 @@ public class CourseVectorRecordReader extends LineRecordReader {
             String type = var5[0];
             String id = var5[1];
 
-            if (type.equals("L") && labeledDocs.containsKey(id)) {
+            if (type.equals("L") && (labeledDocs == null || labeledDocs.containsKey(id))) {
                 ArrayList ret = new ArrayList();
-                System.out.println("id=" + id);
+                //System.out.println("id=" + id);
 
                 for (int var7 = 2; var7 < var6; ++var7) {
                     String s = var5[var7];
@@ -79,7 +80,8 @@ public class CourseVectorRecordReader extends LineRecordReader {
                 }
 
                 //add label
-                ret.add(new Text(labeledDocs.get(id).toString()));
+                if(labeledDocs != null)
+                    ret.add(new Text(labeledDocs.get(id).toString()));
 
                 buffered.add(ret);
             }
